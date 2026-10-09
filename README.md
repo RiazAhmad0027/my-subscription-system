@@ -36,8 +36,5 @@ POST /wp-json/kashif-bakers/v1/webhooks/stripe
 
 ## Author
 **Riaz Ahmad**
-- Fiverr: https://fiverr.com/users/riaz0027
 - Portfolio: https://kashifbakers.shop
-- Email: nangri2211@gmail.com
-
 ## License
