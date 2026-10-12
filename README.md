@@ -1,40 +1,48 @@
 # My Subscription System
 
-Custom WooCommerce subscription plugin with Stripe integration.
+A custom WooCommerce subscription plugin with Stripe, built from scratch in PHP using object-oriented architecture.
 
-## Features
-- ✅ OOP Architecture (Classes, Interfaces, Traits, Namespacing)
-- ✅ REST API Endpoints (GET, POST, PUT, DELETE)
-- ✅ Stripe Payment Gateway Integration
-- ✅ Webhook Handling
-- ✅ Security Hardened (Nonces, Sanitization, Escaping)
-- ✅ Professional Logging System
-- ✅ Production-Ready Code
+**Status: in active development.** Tested on a local WordPress site.
+
+## What works now
+
+- Subscription billing period (monthly / yearly) on WooCommerce products
+- Completed orders create subscription records with a next billing date
+- Duplicate protection (one subscription per order item)
+- Stripe Checkout in subscription mode (recurring card payments)
+- Admin dashboard listing all subscriptions
+- Secured REST endpoint: `GET /wp-json/kashif-bakers/v1/subscriptions` (shop managers only)
+- Logging to a protected uploads folder
+
+## In progress
+
+- Stripe webhooks with signature verification (activation, renewals, failed payments, cancellations)
 
 ## Architecture
-- Plugin class with singleton pattern
-- Subscription management class
-- PaymentGateway interface (extensible)
-- StripeGateway implementation
-- Logger for debugging
 
-## Installation
-1. Download the plugin
-2. Upload to `/wp-content/plugins/`
-3. Activate in WordPress Admin
-4. Configure Stripe API keys in settings
+- `Plugin`: singleton that loads everything
+- `ProductFields`: billing period field on products
+- `Subscription`: creates subscriptions from orders
+- `SubscriptionCheckout`: Stripe Checkout button and session
+- `StripeClient`: small Stripe API helper (no external libraries)
+- `RestApi`, `Logger`
 
-## API Endpoints
+## Setup
 
-GET /wp-json/kashif-bakers/v1/subscriptions
-POST /wp-json/kashif-bakers/v1/subscriptions
-GET /wp-json/kashif-bakers/v1/subscriptions/{id}
-PUT /wp-json/kashif-bakers/v1/subscriptions/{id}
-DELETE /wp-json/kashif-bakers/v1/subscriptions/{id}
-POST /wp-json/kashif-bakers/v1/webhooks/stripe
+Stripe keys are never stored in the code. Add them to `wp-config.php`:
 
+```php
+define( 'MSS_STRIPE_SECRET_KEY', 'sk_test_...' );
+```
+
+## Tested with
+
+WordPress 7.1 · WooCommerce 11 · PHP 8.3 · Stripe test mode
 
 ## Author
-**Riaz Ahmad**
-- Portfolio: https://kashifbakers.shop
+
+Riaz Ahmad · [Portfolio](https://kashifbakers.shop)
+
 ## License
+
+GPL-2.0-or-later
