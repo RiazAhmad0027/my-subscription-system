@@ -37,28 +37,24 @@ add_action( 'plugins_loaded', function() {
     }
 });
 
-// Activation hook - create database table
+// Activation hook - create or update the database table
 register_activation_hook( __FILE__, function() {
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
-    
-    $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}mss_subscriptions (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        user_id bigint(20) NOT NULL,
-        order_id bigint(20) NOT NULL,
-        product_id bigint(20) NOT NULL,
-        billing_period varchar(50),
-        status varchar(50) DEFAULT 'active',
-        created_at datetime DEFAULT CURRENT_TIMESTAMP,
-        next_billing_date date,
-        PRIMARY KEY (id)
-    ) $charset_collate;";
-    
+
+    $sql = "CREATE TABLE {$wpdb->prefix}mss_subscriptions (
+  id mediumint(9) NOT NULL AUTO_INCREMENT,
+  user_id bigint(20) NOT NULL,
+  order_id bigint(20) NOT NULL,
+  product_id bigint(20) NOT NULL,
+  billing_period varchar(50) DEFAULT '' NOT NULL,
+  status varchar(50) DEFAULT 'active' NOT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  next_billing_date date DEFAULT NULL,
+  stripe_subscription_id varchar(255) DEFAULT '' NOT NULL,
+  PRIMARY KEY  (id)
+) $charset_collate;";
+
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     dbDelta( $sql );
-});
-
-// Deactivation hook
-register_deactivation_hook( __FILE__, function() {
-    wp_clear_scheduled_hook( 'mss_renew_subscriptions' );
 });
