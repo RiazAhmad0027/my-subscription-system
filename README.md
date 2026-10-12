@@ -1,46 +1,52 @@
 # My Subscription System
 
-A custom WooCommerce subscription plugin with Stripe, built from scratch in PHP using object-oriented architecture.
+A custom WooCommerce plugin that adds recurring subscriptions with Stripe. It's built from scratch, with no third-party subscription plugin.
 
-**Status: in active development.** Tested on a local WordPress site.
+**Status:** working in test mode. Being prepared for live use.
 
 ## What works now
 
-- Subscription billing period (monthly / yearly) on WooCommerce products
-- Completed orders create subscription records with a next billing date
-- Duplicate protection (one subscription per order item)
-- Stripe Checkout in subscription mode (recurring card payments)
-- Admin dashboard listing all subscriptions
-- Secured REST endpoint: `GET /wp-json/kashif-bakers/v1/subscriptions` (shop managers only)
-- Logging to a protected uploads folder
-
-## In progress
-
-- Stripe webhooks with signature verification (activation, renewals, failed payments, cancellations)
+- "Billing period" option on any WooCommerce product: none, monthly or yearly
+- A subscription is created automatically when an order is paid or completed
+- Customers start monthly or yearly payments through Stripe Checkout, from the order thank-you page
+- Stripe webhooks with signature verification. Activation, renewals, failed payments and cancellations update subscriptions automatically
+- Next billing date updated from Stripe on every renewal
+- Admin page (WP Admin → Subscriptions) listing all subscriptions with their status
+- REST API endpoint `kashif-bakers/v1/subscriptions`, restricted to shop managers
+- Private debug log, protected from public access
 
 ## Architecture
 
-- `Plugin`: singleton that loads everything
-- `ProductFields`: billing period field on products
-- `Subscription`: creates subscriptions from orders
-- `SubscriptionCheckout`: Stripe Checkout button and session
-- `StripeClient`: small Stripe API helper (no external libraries)
-- `RestApi`, `Logger`
+- `my-subscription-system.php`: main file, autoloader, database table on activation
+- `includes/Plugin.php`: loads all parts, admin menu and order hooks
+- `includes/ProductFields.php`: billing period field on products
+- `includes/Subscription.php`: creates and cancels subscriptions
+- `includes/SubscriptionCheckout.php`: "Start payments" button and Stripe Checkout session
+- `includes/StripeClient.php`: small client for the Stripe API
+- `includes/WebhookHandler.php`: verifies Stripe signatures and updates subscriptions
+- `includes/RestApi.php`: REST endpoint
+- `includes/Logger.php`: debug logging
 
 ## Setup
 
-Stripe keys are never stored in the code. Add them to `wp-config.php`:
+1. Upload the plugin folder to `wp-content/plugins/` and activate it (WooCommerce required).
+2. Add your Stripe keys to `wp-config.php` (never put keys in the plugin code):
 
-```php
-define( 'MSS_STRIPE_SECRET_KEY', 'sk_test_...' );
-```
+   define('MSS_STRIPE_SECRET_KEY', 'sk_test_...');
+   define('MSS_STRIPE_WEBHOOK_SECRET', 'whsec_...');
+
+3. In Stripe, add a webhook pointing to:
+   `https://yoursite.com/wp-json/kashif-bakers/v1/webhooks/stripe`
+   with the events `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed` and `customer.subscription.deleted`.
+4. Edit a product, choose a billing period, and save.
 
 ## Tested with
 
-WordPress 7.1 · WooCommerce 11 · PHP 8.3 · Stripe test mode
+WordPress 7.1, WooCommerce 11, PHP 8.3, Stripe test mode.
 
 ## Author
 
+Riaz Ahmad, WordPress and WooCommerce developer
 Riaz Ahmad · [Portfolio](https://kashifbakers.shop)
 
 ## License
